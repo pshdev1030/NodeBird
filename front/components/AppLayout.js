@@ -1,7 +1,17 @@
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Menu, Input, Row, Col } from "antd";
+import { useState } from "react";
+import LoginForm from "../components/LoginForm";
+import UserProfile from "../components/UserProfile";
+import styled from "styled-components";
+
+const SearchInput = styled(Input.Search)`
+  vertical-align: middle;
+`;
+
 const AppLayout = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   return (
     <div>
       <Menu mode="horizontal">
@@ -16,7 +26,7 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item>
-          <Input.Search enterButton style={{ verticalAlign: "middle" }} />
+          <SearchInput enterButton />
         </Menu.Item>
         <Menu.Item>
           <Link href="/signup">
@@ -26,7 +36,11 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          왼쪽
+          {isLoggedIn ? (
+            <UserProfile />
+          ) : (
+            <LoginForm setIsLoggedIn={setIsLoggedIn} />
+          )}
         </Col>
         <Col xs={24} md={12}>
           {children}
@@ -51,4 +65,4 @@ export default AppLayout;
 // xs 모바일 sm 태블릿 md 작은 데스크탑 24등분한것중에 얼마나 차지할것인지
 // 24가 나누기 좋은 숫자
 // gutter =column사이의 간격(px)
->>>>>>> feature/AppLayout
+// 비교하면서 바뀐부분만 랜더링
