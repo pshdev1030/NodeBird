@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import "antd/dist/antd.css";
 import Head from "next/head";
+import wrapper from "../store/configureStore";
 
 const App = ({ Component }) => {
   return (
@@ -18,7 +19,7 @@ App.propTypes = {
   Component: PropTypes.elementType.isRequired,
 };
 
-export default App;
+export default wrapper.withRedux(App);
 
 // Page들의 공통부분
 // index.js 의 Home이 component로 들어와서 랜더링 된다.
