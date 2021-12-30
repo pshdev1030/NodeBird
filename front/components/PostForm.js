@@ -1,21 +1,26 @@
 import { Button, Form, Input } from "antd";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ADD_POST_ACTION } from "../reducers/post";
+import useInput from "../hooks/useInput";
+import { addPost } from "../reducers/post";
 useSelector;
 const PostForm = () => {
   const dispatch = useDispatch();
-  const imageInput = useRef();
-  //   실제 돔에 접근해야할 때 사용
-  const { imagePaths } = useSelector((state) => state.post);
-  const [text, setText] = useState("");
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  }, []);
+  const { imagePaths, addPostDone, addPostLoading } = useSelector(
+    (state) => state.post
+  );
+  const [text, onChangeText, setText] = useInput("");
+
+  useEffect(() => {
+    if (addPostDone) {
+      setText("");
+    }
+  }, [addPostDone]);
   const onSubmit = useCallback(() => {
-    dispatch(ADD_POST_ACTION);
-    setText("");
-  }, []);
+    dispatch(addPost(text));
+  }, [text]);
+
+  const imageInput = useRef();
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
   }, [imageInput.current]);
@@ -34,8 +39,13 @@ const PostForm = () => {
       <div>
         <input type="file" multiple hidden ref={imageInput} />
         <Button onClick={onClickImageUpload}>이미지 업로드</Button>
-        <Button type="primary" style={{ float: "right" }} htmlType="submit">
-          짹쨱
+        <Button
+          type="primary"
+          style={{ float: "right" }}
+          htmlType="submit"
+          loading={addPostLoading}
+        >
+          짹짹
         </Button>
       </div>
       <div>
