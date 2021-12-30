@@ -1,50 +1,50 @@
 import shortId from "shortid";
-
+import faker from "faker";
 import { produce } from "immer";
 export const initialState = {
-  mainPosts: [
-    {
-      id: "asdf11",
+  mainPosts: [],
+  imagePaths: [],
+  addPostLoading: false,
+  addPostDone: false,
+  addPostError: null,
+  hasMorePost: true,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
+  removePostLoading: false,
+  removePostDone: false,
+  removePostError: null,
+};
+
+export const generateDummyPost = (number) =>
+  Array(number)
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
       User: {
-        id: 1,
-        nickname: "제로초",
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
       },
-      content: "첫 번째 게시글",
+      content: faker.lorem.paragraph(),
       Images: [
         {
-          src: "https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726",
-        },
-        {
-          src: "https://gimg.gilbut.co.kr/book/BN001958/rn_view_BN001958.jpg",
-        },
-        {
-          src: "https://gimg.gilbut.co.kr/book/BN001998/rn_view_BN001998.jpg",
+          src: "https://via.placeholder.com/640",
         },
       ],
       Comments: [
         {
           User: {
-            nickname: "nero",
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
           },
-          content: "우와 개정판이 나왔군요~",
-        },
-        {
-          User: {
-            nickname: "hero",
-          },
-          content: "얼른 사고싶어요~",
+          content: faker.lorem.sentence(),
         },
       ],
-    },
-  ],
-  imagePaths: [],
-  addPostLoading: false,
-  addPostDone: false,
-  addPostError: null,
-  removePostLoading: false,
-  removePostDone: false,
-  removePostError: null,
-};
+    }));
+
+export const LOAD_POST_REQUEST = "LOAD_POST_REQUEST";
+export const LOAD_POST_SUCCESS = "LOAD_POST_SUCCESS";
+export const LOAD_POST_FAILURE = "LOAD_POST_FAILURE";
 
 export const ADD_POST_REQUEST = "ADD_POST_REQUEST";
 export const ADD_POST_SUCCESS = "ADD_POST_SUCCESS";
@@ -96,8 +96,24 @@ const dummyComment = (data) => ({
 });
 
 const reducer = (state = initialState, action) => {
-  return produce(state, (drart) => {
+  return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_POST_REQUEST:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.hasMorePost = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = false;
+        draft.loadPostError = action.data.Error;
+        break;
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;

@@ -12,6 +12,10 @@ import {
   REMOVE_POST_OF_ME,
   REMOVE_POST_SUCCESS,
   REMOVE_POST_REQUEST,
+  LOAD_POST_FAILURE,
+  LOAD_POST_REQUEST,
+  LOAD_POST_SUCCESS,
+  generateDummyPost,
 } from "../reducers/post";
 import shortId from "shortid";
 
@@ -21,7 +25,6 @@ function addPostAPI() {
 
 function* addPost(action) {
   try {
-    console.log("addPost");
     const id = shortId.generate();
     yield delay(1000);
     yield put({
@@ -82,6 +85,25 @@ function* removePost(action) {
   }
 }
 
+function* loadPost() {
+  try {
+    yield delay(1000);
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: generateDummyPost(10),
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function* watchLoadPost() {
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
+
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
@@ -95,5 +117,10 @@ function* watchRemovePost() {
 }
 
 export default function* postSaga() {
-  yield all([fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
+  yield all([
+    fork(watchAddPost),
+    fork(watchAddComment),
+    fork(watchRemovePost),
+    fork(watchLoadPost),
+  ]);
 }
